@@ -10,7 +10,7 @@
 # Ignore build and compiled files
 /build/
 /dist/
-/node_modules/
+/node_modules
 *.dll
 *.exe
 
