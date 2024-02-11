@@ -8,7 +8,7 @@
 *.swp
 
 # Ignore build and compiled files
-/build/
+/build/ 
 /dist/
 /node_modules
 *.dll
