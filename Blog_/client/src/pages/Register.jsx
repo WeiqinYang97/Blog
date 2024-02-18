@@ -2,6 +2,9 @@ import React from 'react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import axios from "axios"
+import { useNavigate } from 'react-router-dom';
+
+
 
 //怎么做到一下子都改成功的，userState 很重要
 const Register = () => {
@@ -11,6 +14,11 @@ const Register = () => {
         password: "",
 
     })
+    const [err, setError] = useState(null);
+
+    const navigate = useNavigate()   //import { useNavigate } from 'react-router-dom'; 这个和视频里的不一样
+
+
 
     const handleChange = e => {
         setInputs(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -19,10 +27,12 @@ const Register = () => {
     const handleSubmit = async e => {     //async
         e.preventDefault()
         try {
-            const res = await axios.post("/auth/register", inputs)
-            console.log(res)
+            await axios.post("/api/auth/register", inputs)
+            navigate("/login");
+
         } catch (err) {
             console.log(err)
+            setError(err.response.data);
         }
     }
 
@@ -36,7 +46,7 @@ const Register = () => {
                 <input required type="email" placeholder='email' name='email' onChange={handleChange} />
                 <input required type="text" placeholder='password' name='password' onChange={handleChange} />
                 <button onClick={handleSubmit}>Register</button>
-                <p>This is an error!</p>
+                {err && <p>{err}</p>}
                 <span>Do you have an account? <Link to="/login">Login</Link></span>
             </form>
         </div>
