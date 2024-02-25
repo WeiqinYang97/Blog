@@ -1,48 +1,80 @@
-import React from 'react'
-import Edit from '../img/edit.png'
-import Delete from '../img/delete.png'
-import { Link } from 'react-router-dom'
-import Menu from '../components/Menu'
+import React, { useContext, useEffect, useState } from 'react';
+import Edit from '../img/edit.png';
+import Delete from '../img/delete.png';
+import { Link, Navigate, useLocation, useNavigate, useNavigation } from 'react-router-dom';
+import Menu from '../components/Menu';
+import axios from 'axios';
+import moment from 'moment/moment';
+import { AuthContext } from '../context/authContext';
 
 
 
 const Single = () => {
+    const [post, setPost] = useState({});
+
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const postId = location.pathname.split("/")[2]
+
+    const { currentUser } = useContext(AuthContext)
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const url = "/api/posts/" + postId;
+                const res = await axios.get(url); //调用后端接口API，拉取当前的文章
+                setPost(res.data); //将拉取到的文章用post 保存
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        fetchData();
+    }, [postId]);
+
+    const handleDelete = async () => {
+        try {
+            await axios.delete(`/api/posts/${postId}`);
+            navigate("/");
+        } catch (err) {
+            console.log(err);
+        }
+    }
+    console.log(Edit);
+    console.log(currentUser.username);
+    console.log(post.username);
+
     return (
         <div className='single'>
             <div className="content">
-                <img src="https://images.pexels.com/photos/6157049/pexels-photo-6157049.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="" />
+                <img
+                    src={post?.img}
+                    alt="" />
                 <div className="user">
-                    <img src="https://images.pexels.com/photos/6157049/pexels-photo-6157049.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" alt="" />
+                    {post.userImg && <img
+                        src={post.userImg}
+                        alt=""
+                    />}
                     <div className="info">
-                        <span>John</span>
-                        <p>Posted two days ago</p>
+                        <span>{post.username}</span>
+                        <p>Posted {moment(post.data).fromNow()}</p>
                     </div>
-                    <div className="edit">
-                        <Link to={`/write?edit=2`}>
-                            <img src={Edit} alt="" />
-                        </Link>
-                        <img src={Delete} alt="" />
-                    </div>
+                    {currentUser.username === post.username && (
+                        <div className="edit">
+                            <Link to={`/write?edit=2`}>
+                                <img src={Edit} alt="" />
+                            </Link>
+                            <img onClick={handleDelete} src={Delete} alt="" />
+                        </div>
+                    )}
                 </div>
+                <h1>{post.title}</h1>
+                {post.desc}
             </div>
-            <h1>Thank you for creating this software.</h1>
-            <p>
-                <p><b>Today's digital landscape</b> is evolving at an unprecedented pace, presenting both challenges and opportunities.</p>
-                <p>One of the key aspects is the <b>integration of AI technologies</b> in everyday applications, transforming how we interact with digital platforms.</p>
-                <p>The <b>importance of user experience</b> cannot be overstated. It's vital to design interfaces that are not only functional but also intuitive and engaging.</p>
-                <p>Another significant trend is the <b>rise of data-driven decision making</b>. Leveraging big data allows for more informed and strategic business choices.</p>
-                <p>However, this brings forth the <b>issue of data privacy</b>. It's crucial to balance innovation with ethical considerations and user privacy.</p>
-                <p>In conclusion, staying abreast of these trends is essential for anyone involved in the tech industry, ensuring relevance in a rapidly changing environment.</p>
-
-
-            </p>
-
-
-
-            {/* <div className="menu">m</div> */}
-            <Menu />
+            <Menu cat={post.cat} />
         </div>
-    )
-}
+    );
+};
 
 export default Single
