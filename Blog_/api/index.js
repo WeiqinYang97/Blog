@@ -24,6 +24,8 @@ app.use("/api/users", userRoutes)
 app.use("/api/posts", postRoutes)
 
 
-app.listen(8800, () => {
-    console.log("Connected!")
-})
+const port = process.argv.slice(2)[0] || 8800;
+
+app.listen(port, () => {
+    console.log(`Connected! Server is running on port ${port}`);
+});
